@@ -1,11 +1,11 @@
 import React, { useState, useCallback } from 'react';
 import { Question, Option, UserAnswer, AssessmentResult } from './types';
-import QuestionCard from './components/QuestionCard';
-import ResultView from './components/ResultView';
-import ProgressBar from './components/ProgressBar';
-import SignupForm from './components/SignupForm';
-import { analyzeEligibility } from './services/gemini';
-import { saveLeadToSheet } from './services/sheet';
+import QuestionCard from './QuestionCard';
+import ResultView from './ResultView';
+import ProgressBar from './ProgressBar';
+import SignupForm from './SignupForm';
+import { analyzeEligibility } from './gemini';
+import { saveLeadToSheet } from './sheet';
 import { GraduationCap, School, Euro, Languages, Award, Loader2, ArrowRight, BookOpen } from 'lucide-react';
 
 // Define the 5 static questions
