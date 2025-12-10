@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { User, Phone, ArrowRight, ShieldCheck } from 'lucide-react';
+import { User, Phone, ArrowRight, ShieldCheck, Languages } from 'lucide-react';
 
 interface SignupFormProps {
-  onSubmit: (name: string, phone: string) => void;
+  onSubmit: (name: string, phone: string, language: string) => void;
 }
 
 const SignupForm: React.FC<SignupFormProps> = ({ onSubmit }) => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [language, setLanguage] = useState('English');
   const [errors, setErrors] = useState<{name?: string, phone?: string}>({});
 
   const validatePhone = (input: string): string | undefined => {
@@ -84,7 +85,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSubmit }) => {
       return;
     }
 
-    onSubmit(name, phone);
+    onSubmit(name, phone, language);
   };
 
   return (
@@ -129,6 +130,29 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSubmit }) => {
           <p className="text-slate-400 text-[10px] mt-1 ml-1">
             Format: Country Code + Number (e.g., +91.., +49.., +971..)
           </p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-slate-700 mb-2">Preferred Language</label>
+          <div className="relative">
+             <Languages className="absolute left-4 top-3.5 w-5 h-5 text-slate-400" />
+             <select 
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all bg-white appearance-none cursor-pointer"
+             >
+                <option value="English">English</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Malayalam">Malayalam</option>
+                <option value="Tamil">Tamil</option>
+                <option value="Kannada">Kannada</option>
+                <option value="Telugu">Telugu</option>
+                <option value="Other">Other</option>
+             </select>
+             <div className="absolute right-4 top-4 pointer-events-none">
+                 <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+             </div>
+          </div>
         </div>
 
         <div className="pt-2">
