@@ -20,7 +20,7 @@ const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbz6G5cEA1UQEG
 // ============================================================================
 
 
-export const saveLeadToSheet = async (name: string, phone: string, answers: UserAnswer[]) => {
+export const saveLeadToSheet = async (name: string, phone: string, language: string, answers: UserAnswer[]) => {
   // Use the hardcoded URL above, or fall back to environment variable
   const targetUrl = SHEET_WEBHOOK_URL || process.env.GOOGLE_SHEETS_WEBHOOK_URL;
 
@@ -36,6 +36,7 @@ export const saveLeadToSheet = async (name: string, phone: string, answers: User
       timestamp: new Date().toISOString(),
       name,
       phone,
+      language,
       // Format answers for easier reading in a single cell
       answers: answers.map(a => `${a.questionText}: ${a.selectedOption.label}`).join(' | ')
     };
@@ -73,13 +74,13 @@ export const saveLeadToSheet = async (name: string, phone: string, answers: User
     
     // 2. Add headers if the sheet is empty
     if (sheet.getLastRow() === 0) {
-      sheet.appendRow(["Date", "Name", "Phone", "Assessment Details"]);
+      sheet.appendRow(["Date", "Name", "Phone", "Language", "Assessment Details"]);
       sheet.setFrozenRows(1);
-      sheet.getRange(1, 1, 1, 4).setFontWeight("bold");
+      sheet.getRange(1, 1, 1, 5).setFontWeight("bold");
     }
     
     // 3. Append the new row
-    sheet.appendRow([new Date(), data.name, data.phone, data.answers]);
+    sheet.appendRow([new Date(), data.name, data.phone, data.language, data.answers]);
     
     // 4. Return success message
     return ContentService.createTextOutput("Success");
