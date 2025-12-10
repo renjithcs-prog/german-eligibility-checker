@@ -1,13 +1,12 @@
 import React, { useState, useCallback } from 'react';
 import { Question, Option, UserAnswer, AssessmentResult } from './types';
-import QuestionCard from './QuestionCard';
-import ResultView from './ResultView';
-import ProgressBar from './ProgressBar';
-import SignupForm from './SignupForm';
-import { analyzeEligibility } from './gemini';
-import { saveLeadToSheet } from './sheet';
+import QuestionCard from './components/QuestionCard';
+import ResultView from './components/ResultView';
+import ProgressBar from './components/ProgressBar';
+import SignupForm from './components/SignupForm';
+import { analyzeEligibility } from './services/gemini';
+import { saveLeadToSheet } from './services/sheet';
 import { GraduationCap, School, Euro, Languages, Award, Loader2, ArrowRight, BookOpen } from 'lucide-react';
-import { Analytics } from '@vercel/analytics/react'; // 1. IMPORT ADDED
 
 // Define the 5 static questions
 const QUESTIONS: Question[] = [
@@ -95,7 +94,7 @@ const App: React.FC = () => {
     }
   }, [currentStep, answers]);
 
-  const handleSignupSubmit = async (name: string, phone: string) => {
+  const handleSignupSubmit = async (name: string, phone: string, language: string) => {
     setUserData({ name, phone });
     setShowSignup(false);
     setLoading(true);
@@ -104,7 +103,7 @@ const App: React.FC = () => {
     try {
       // Save to Google Sheet
       // We await this to ensure the browser actually sends the request before proceeding to heavy logic
-      await saveLeadToSheet(name, phone, answers);
+      await saveLeadToSheet(name, phone, language, answers);
 
       // Pass the captured name to the analysis service
       const analysis = await analyzeEligibility(answers, name);
@@ -144,9 +143,9 @@ const App: React.FC = () => {
           <div className="inline-flex items-center justify-center p-2 bg-white/90 backdrop-blur rounded-2xl shadow-lg mb-8 animate-bounce ring-1 ring-slate-200">
              <div className="flex items-center space-x-2 px-3 py-1">
                <span className="relative flex h-3 w-3">
-                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                 <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-               </span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
                <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">Updated for 2026 Intake</span>
              </div>
           </div>
@@ -172,7 +171,7 @@ const App: React.FC = () => {
             </button>
             
             <p className="text-sm font-medium text-slate-500 italic">
-                Takes less than 1 minute
+               Takes less than 1 minute
             </p>
           </div>
         </div>
@@ -214,14 +213,14 @@ const App: React.FC = () => {
             <div className="absolute inset-0 bg-slate-50/95 backdrop-blur-sm"></div>
         </div>
 
-          <div className="relative z-10 max-w-5xl mx-auto mb-6">
+         <div className="relative z-10 max-w-5xl mx-auto mb-6">
              <button onClick={handleReset} className="text-sm font-medium text-slate-600 hover:text-slate-900 flex items-center bg-white/50 px-3 py-1 rounded-full backdrop-blur-sm transition-colors">
                  &larr; Back to Home
              </button>
-          </div>
-          <div className="relative z-10">
-             <ResultView result={result} userName={userData?.name} onReset={handleReset} />
-          </div>
+         </div>
+         <div className="relative z-10">
+            <ResultView result={result} userName={userData?.name} onReset={handleReset} />
+         </div>
       </div>
     );
   }
@@ -230,16 +229,16 @@ const App: React.FC = () => {
   if (error) {
     return (
        <div className="min-h-screen relative flex flex-col items-center justify-center p-6">
-         <div className="absolute inset-0 z-0 bg-slate-50"></div>
-         <div className="relative z-10 bg-white p-10 rounded-3xl shadow-xl text-center max-w-md w-full border border-red-100">
-           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <div className="absolute inset-0 z-0 bg-slate-50"></div>
+        <div className="relative z-10 bg-white p-10 rounded-3xl shadow-xl text-center max-w-md w-full border border-red-100">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
              <span className="text-2xl text-red-600 font-bold">!</span>
-           </div>
-           <h2 className="text-xl font-bold text-slate-900 mb-2">Assessment Failed</h2>
-           <p className="text-slate-500 mb-6">{error}</p>
-           <button onClick={handleReset} className="px-6 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors">Try Again</button>
-         </div>
-       </div>
+          </div>
+          <h2 className="text-xl font-bold text-slate-900 mb-2">Assessment Failed</h2>
+          <p className="text-slate-500 mb-6">{error}</p>
+          <button onClick={handleReset} className="px-6 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors">Try Again</button>
+        </div>
+      </div>
     );
   }
 
@@ -247,17 +246,17 @@ const App: React.FC = () => {
   if (showSignup) {
       return (
         <div className="min-h-screen relative flex flex-col items-center justify-center p-4">
-           <div className="absolute inset-0 z-0">
-              <img 
-                  src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80" 
-                  alt="Study Background" 
-                  className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-slate-50/95"></div>
-          </div>
-          <div className="relative z-10 w-full">
-              <SignupForm onSubmit={handleSignupSubmit} />
-          </div>
+             <div className="absolute inset-0 z-0">
+                <img 
+                    src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80" 
+                    alt="Study Background" 
+                    className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-slate-50/95"></div>
+            </div>
+            <div className="relative z-10 w-full">
+                 <SignupForm onSubmit={handleSignupSubmit} />
+            </div>
         </div>
       )
   }
@@ -290,12 +289,4 @@ const App: React.FC = () => {
   );
 };
 
-// 2. EXPORT MODIFIED: Wrap the App component to include Analytics
-const AppWithAnalytics: React.FC = () => (
-    <>
-        <App />
-        <Analytics />
-    </>
-);
-
-export default AppWithAnalytics;
+export default App;
